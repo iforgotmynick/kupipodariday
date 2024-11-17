@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -17,17 +17,12 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...otherUserData } = createUserDto;
-
-    // Hash the password
     const hashedPassword = await this.hashingService.hashPassword(password);
-
-    // Create the user entity with the hashed password
     const newUser = this.userRepository.create({
       ...otherUserData,
       password: hashedPassword,
     });
 
-    // Save the user to the database
     return this.userRepository.save(newUser);
   }
 
@@ -45,27 +40,40 @@ export class UsersService {
   async findOneByUsername(username: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ username });
 
+    if (!user) {
+      throw new NotFoundException(`User with username ${username} not found`);
+    }
+
+    delete user.email;
+
     return user;
   }
 
   async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
 
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
     if (updateUserDto?.password) {
       updateUserDto.password = await this.hashingService.hashPassword(
         updateUserDto.password,
       );
     }
-    const user = await this.userRepository.update({ id }, updateUserDto);
 
-    return user;
+    const updatedUser = this.userRepository.merge(user, updateUserDto);
+
+    return this.userRepository.save(updatedUser);
   }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} user`;
-  // }
 }

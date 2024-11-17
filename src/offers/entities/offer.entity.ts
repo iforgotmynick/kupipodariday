@@ -5,8 +5,8 @@ import {
   OneToOne,
   CreateDateColumn,
 } from 'typeorm';
-import { Wish } from './wish.entity';
-import { User } from './user.entity';
+import { Wish } from '../../wishes/entities/wish.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Offer {

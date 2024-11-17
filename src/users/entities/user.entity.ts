@@ -7,9 +7,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Offer } from './offer.entity';
-import { Wish } from '../../entities/wish.entity';
+import { Offer } from '../../offers/entities/offer.entity';
+import { Wish } from '../../wishes/entities/wish.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -37,6 +38,7 @@ export class User {
   email: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @OneToMany(() => Wish, (wish) => wish.id)

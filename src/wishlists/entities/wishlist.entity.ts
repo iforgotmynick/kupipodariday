@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
   JoinTable,
 } from 'typeorm';
-import { Wish } from './wish.entity';
+import { Wish } from '../../wishes/entities/wish.entity';
 
 @Entity()
 export class Wishlist {

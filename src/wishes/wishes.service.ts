@@ -1,85 +1,79 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
-import { UpdateWishDto } from './dto/update-wish.dto';
 import { Wish } from './entities/wish.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UpdateWishDto } from './dto/update-wish.dto';
 
 @Injectable()
 export class WishesService {
   private readonly logger = new Logger('WishesService');
-
-  readonly wishList: Wish[] = [
-    {
-      id: 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      name: '1',
-      link: '1',
-      image: '1',
-      price: 0,
-      raised: 0,
-      description: '1',
-      offers: {
-        id: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        username: '1',
-        about: '1',
-        avatar: '1',
-        email: '1',
-        password: '1',
-        wishes: [],
-        offers: [],
-        wishlists: [],
-      },
-      copied: 0,
-    },
-    {
-      id: 2,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      name: '2',
-      link: '2',
-      image: '2',
-      price: 0,
-      raised: 0,
-      description: '2',
-      offers: {
-        id: 2,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        username: '2',
-        about: '2',
-        avatar: '2',
-        email: '2',
-        password: '2',
-        wishes: [],
-        offers: [],
-        wishlists: [],
-      },
-      copied: 0,
-    },
-  ];
 
   constructor(
     @InjectRepository(Wish)
     private readonly wishRepository: Repository<Wish>,
   ) {}
 
-  async findByUsername(username: string): Promise<Wish[]> {
-    return this.wishList;
+  async createWish(wish: CreateWishDto): Promise<Wish> {
+    const newWish = this.wishRepository.create(wish);
+
+    return this.wishRepository.save(newWish);
   }
 
-  async findByIdLast(id: number): Promise<Wish[]> {
-    const wishes = await this.wishRepository.findBy({ id });
+  async findLast(): Promise<Wish[]> {
+    const wish = await this.wishRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 1,
+    });
 
-    return [this.wishList[0]];
+    return wish;
   }
 
-  async findByIdTop(id: number): Promise<Wish[]> {
-    const wishes = await this.wishRepository.findBy({ id });
+  async findTop(): Promise<Wish[]> {
+    const wish = await this.wishRepository.find({
+      order: {
+        copied: 'DESC',
+      },
+      take: 1,
+    });
 
-    return [this.wishList[1]];
+    return wish;
+  }
+
+  async findOne(id: number): Promise<Wish> {
+    const wish = await this.wishRepository.findOneBy({ id });
+
+    if (!wish) {
+      throw new NotFoundException(`Wish with ID ${id} not found`);
+    }
+
+    return wish;
+  }
+
+  async update(id: number, updateWishDto: UpdateWishDto): Promise<Wish> {
+    const wish = await this.wishRepository.findOne({ where: { id } });
+
+    if (!wish) {
+      throw new NotFoundException(`Wish with ID ${id} not found`);
+    }
+
+    const updatedWish = this.wishRepository.merge(wish, updateWishDto);
+
+    return this.wishRepository.save(updatedWish);
+  }
+  async remove(id: number): Promise<Wish> {
+    const wish = await this.wishRepository.findOne({ where: { id } });
+
+    if (!wish) {
+      throw new NotFoundException(`Wish with ID ${id} not found`);
+    }
+
+    return this.wishRepository.remove(wish);
+  }
+
+  async copy(id: number): Promise<Wish> {
+    throw new NotFoundException(`COPY ID ${id} PLEASE`);
   }
 }

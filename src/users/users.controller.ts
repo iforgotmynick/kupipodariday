@@ -5,15 +5,15 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   Request,
   UseGuards,
   Logger,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtGuard } from 'src/guards/jwt.guard';
+import { JwtGuard } from '../guards/jwt.guard';
+import { User } from './entities/user.entity';
+import { Wish } from 'src/wishes/entities/wish.entity';
 
 @Controller('users')
 @UseGuards(JwtGuard)
@@ -21,38 +21,37 @@ export class UsersController {
   private readonly logger = new Logger('UsersController');
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
-  @Post('find')
-  findMany(@Body() { query }: { query: string }) {
-    return this.usersService.findBySearch(query);
-  }
-
   @Get('me')
-  getMe(@Request() req) {
+  findOwn(@Request() req): Promise<User> {
     return req.user;
   }
 
   @Patch('me')
-  patchMe(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+  update(@Request() req, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     return this.usersService.update(req.user.id, updateUserDto);
   }
 
+  @Get('me/wishes')
+  getOwnWishes(@Request() req): Promise<Wish[]> {
+    return this.usersService
+      .findOneByUsername(req.user.name)
+      .then((user) => user.wishes);
+  }
+
   @Get(':id')
-  findOne(@Param('id') username: string) {
+  findOne(@Param('id') username: string): Promise<User> {
     return this.usersService.findOneByUsername(username);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
+  @Get(':id/wishes')
+  getWishes(@Param('id') username: string): Promise<Wish[]> {
+    return this.usersService
+      .findOneByUsername(username)
+      .then((user) => user.wishes);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
+  @Post('find')
+  findMany(@Body() { query }: { query: string }): Promise<User[]> {
+    return this.usersService.findBySearch(query);
+  }
 }
