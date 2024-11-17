@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { WishesService } from './wishes.service';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
@@ -11,7 +21,7 @@ export class WishesController {
 
   @Get('users/me/wishes')
   myWishes(@Request() req) {
-    return this.wishesService.findById(req.user.id);
+    return this.wishesService.findByUsername(req.user.username);
   }
 
   @Get('wishes/last')
@@ -24,9 +34,9 @@ export class WishesController {
     return this.wishesService.findByIdTop(req.user.id);
   }
 
-  @Get(':id/wishes')
-  findOne(@Param('id') id: string) {
-    return this.wishesService.findById(+id);
+  @Get('users/:id/wishes')
+  findOne(@Param('id') username: string) {
+    return this.wishesService.findByUsername(username);
   }
 
   // @Patch(':id')

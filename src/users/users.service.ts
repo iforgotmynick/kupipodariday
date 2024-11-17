@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from '../entities/user.entity';
+import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { HashingService } from 'src/services/hashing/hashing.service';
 
 @Injectable()
@@ -29,6 +29,17 @@ export class UsersService {
 
     // Save the user to the database
     return this.userRepository.save(newUser);
+  }
+
+  async findBySearch(search: string): Promise<User[]> {
+    const users = await this.userRepository.find({
+      where: [
+        { username: Like(`%${search}%`) },
+        { email: Like(`%${search}%`) },
+      ],
+    });
+
+    return users;
   }
 
   async findOneByUsername(username: string): Promise<User> {

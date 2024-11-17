@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Offer } from './offer.entity';
-import { Wish } from './wish.entity';
-import { Wishlist } from './wishlist.entity';
+import { Wish } from '../../entities/wish.entity';
+import { Wishlist } from '../../wishlists/entities/wishlist.entity';
 
 @Entity()
 export class User {

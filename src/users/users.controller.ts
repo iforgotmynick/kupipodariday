@@ -26,6 +26,11 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Post('find')
+  findMany(@Body() { query }: { query: string }) {
+    return this.usersService.findBySearch(query);
+  }
+
   @Get('me')
   getMe(@Request() req) {
     return req.user;
@@ -37,8 +42,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findOne(@Param('id') username: string) {
+    return this.usersService.findOneByUsername(username);
   }
 
   // @Patch(':id')

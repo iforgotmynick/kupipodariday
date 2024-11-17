@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
-import { Wish } from 'src/entities/wish.entity';
+import { Wish } from './entities/wish.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -67,9 +67,7 @@ export class WishesService {
     private readonly wishRepository: Repository<Wish>,
   ) {}
 
-  async findById(id: number): Promise<Wish[]> {
-    const wishes = await this.wishRepository.findBy({ id });
-
+  async findByUsername(username: string): Promise<Wish[]> {
     return this.wishList;
   }
 
