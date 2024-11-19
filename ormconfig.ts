@@ -14,4 +14,5 @@ export const AppDataSource = new DataSource({
   entities: [User, Wish, Offer, Wishlist],
   migrations: ['./src/database/migrations/*.ts'],
   synchronize: false,
+  logging: true,
 });

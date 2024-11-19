@@ -2,7 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { Wish } from './entities/wish.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { User } from '../users/entities/user.entity';
 
@@ -26,7 +26,7 @@ export class WishesService {
       order: {
         createdAt: 'DESC',
       },
-      take: 1,
+      take: 40,
     });
 
     return wish;
@@ -37,7 +37,7 @@ export class WishesService {
       order: {
         copied: 'DESC',
       },
-      take: 1,
+      take: 20,
     });
 
     return wish;
@@ -87,5 +87,9 @@ export class WishesService {
     const newWish = this.wishRepository.create({ ...wish, owner });
 
     return this.wishRepository.save(newWish);
+  }
+
+  async findByIds(ids: number[]) {
+    return this.wishRepository.findBy({ id: In(ids) });
   }
 }

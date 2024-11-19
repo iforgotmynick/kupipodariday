@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { WishlistsService } from './wishlists.service';
@@ -13,6 +14,7 @@ import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { Wishlist } from './entities/wishlist.entity';
+import { IsOwnerGuard } from '../guards/is-owner.guard';
 
 @Controller('wishlists')
 @UseGuards(JwtGuard)
@@ -25,8 +27,11 @@ export class WishlistsController {
   }
 
   @Post()
-  create(@Body() createWishlistDto: CreateWishlistDto): Promise<Wishlist> {
-    return this.wishlistsService.create(createWishlistDto);
+  create(
+    @Request() req,
+    @Body() createWishlistDto: CreateWishlistDto,
+  ): Promise<Wishlist> {
+    return this.wishlistsService.create(req.user, createWishlistDto);
   }
 
   @Get(':id')
@@ -35,6 +40,7 @@ export class WishlistsController {
   }
 
   @Patch(':id')
+  @UseGuards(IsOwnerGuard)
   update(
     @Param('id') id: string,
     @Body() updateWishlistDto: UpdateWishlistDto,

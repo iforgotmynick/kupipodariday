@@ -7,9 +7,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Offer } from '../../offers/entities/offer.entity';
+import { Wishlist } from 'src/wishlists/entities/wishlist.entity';
 
 @Entity()
 export class Wish {
@@ -47,10 +49,11 @@ export class Wish {
   })
   owner: User;
 
-  @OneToMany(() => Offer, (offer) => offer.id, {
-    cascade: true,
-  })
+  @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
+
+  @ManyToMany(() => Wishlist, (wishlist) => wishlist.items)
+  lists: Wishlist[];
 
   @Column({ default: 0 })
   copied: number;

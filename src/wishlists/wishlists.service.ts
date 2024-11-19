@@ -4,6 +4,9 @@ import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { Wishlist } from './entities/wishlist.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { WishesService } from 'src/wishes/wishes.service';
+import { Wish } from 'src/wishes/entities/wish.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class WishlistsService {
@@ -12,10 +15,20 @@ export class WishlistsService {
   constructor(
     @InjectRepository(Wishlist)
     private readonly wishlistRepository: Repository<Wishlist>,
+    private readonly wishesService: WishesService,
   ) {}
 
-  async create(createWishlistDto: CreateWishlistDto): Promise<Wishlist> {
-    const wishlist = this.wishlistRepository.create(createWishlistDto);
+  async create(
+    owner: User,
+    createWishlistDto: CreateWishlistDto,
+  ): Promise<Wishlist> {
+    const wishes = await this.wishesService.findByIds(createWishlistDto.items);
+
+    const wishlist = this.wishlistRepository.create({
+      ...createWishlistDto,
+      items: wishes,
+      owner,
+    });
 
     return this.wishlistRepository.save(wishlist);
   }
@@ -25,7 +38,10 @@ export class WishlistsService {
   }
 
   async findOne(id: number): Promise<Wishlist> {
-    const wishlist = this.wishlistRepository.findOneBy({ id });
+    const wishlist = await this.wishlistRepository.findOne({
+      where: { id },
+      relations: ['items', 'owner'],
+    });
 
     if (!wishlist) {
       throw new NotFoundException(`Wishlist with ID ${id} not found`);
@@ -44,10 +60,15 @@ export class WishlistsService {
       throw new NotFoundException(`Wishlist with ID ${id} not found`);
     }
 
-    const updatedWishlist = this.wishlistRepository.merge(
-      wishlist,
-      updateWishlistDto,
-    );
+    let items: Wish[] = [];
+    if (updateWishlistDto.items) {
+      items = await this.wishesService.findByIds(updateWishlistDto.items);
+    }
+
+    const updatedWishlist = this.wishlistRepository.merge(wishlist, {
+      ...updateWishlistDto,
+      items,
+    });
 
     return this.wishlistRepository.save(updatedWishlist);
   }

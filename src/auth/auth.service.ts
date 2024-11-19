@@ -16,14 +16,14 @@ export class AuthService {
   auth(user: User) {
     const payload = { sub: user.id };
 
-    return { access_token: this.jwtService.sign(payload) };
+    return { access_token: this.jwtService.sign(payload, { expiresIn: '1h' }) };
   }
 
   async validatePassword(username: string, password: string) {
     const user = await this.usersService.findOneByUsername(username);
 
     if (user && this.hashingService.comparePassword(password, user.password)) {
-      const { password, ...result } = user;
+      const { password: _, ...result } = user;
 
       return result;
     }

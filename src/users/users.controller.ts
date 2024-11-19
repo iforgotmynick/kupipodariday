@@ -13,7 +13,8 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtGuard } from '../guards/jwt.guard';
 import { User } from './entities/user.entity';
-import { Wish } from 'src/wishes/entities/wish.entity';
+import { Wish } from '../wishes/entities/wish.entity';
+import { IsOwnerGuard } from '../guards/is-owner.guard';
 
 @Controller('users')
 @UseGuards(JwtGuard)
@@ -27,17 +28,16 @@ export class UsersController {
   }
 
   @Patch('me')
+  @UseGuards(IsOwnerGuard)
   update(@Request() req, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     return this.usersService.update(req.user.id, updateUserDto);
   }
 
   @Get('me/wishes')
   getOwnWishes(@Request() req): Promise<Wish[]> {
-    this.logger.log('req.user', JSON.stringify(req.user));
     return this.usersService
       .findOneByUsername(req.user.name)
       .then((user) => {
-        this.logger.log('user', JSON.stringify(user));
         return user;
       })
       .then((user) => user.wishes);

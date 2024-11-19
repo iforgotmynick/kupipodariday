@@ -6,8 +6,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinTable,
+  ManyToOne,
 } from 'typeorm';
 import { Wish } from '../../wishes/entities/wish.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity()
 export class Wishlist {
@@ -23,13 +25,16 @@ export class Wishlist {
   @Column()
   name: string;
 
-  @Column({ length: 1500 })
-  description: string;
+  @Column({ length: 1500, nullable: true })
+  description?: string;
 
   @Column()
   image: string;
 
-  @ManyToMany(() => Wish)
+  @ManyToMany(() => Wish, (wish) => wish.lists)
   @JoinTable()
   items: Wish[];
+
+  @ManyToOne(() => User, (user) => user.wishlists)
+  owner: User;
 }
