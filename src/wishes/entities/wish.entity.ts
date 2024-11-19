@@ -6,8 +6,10 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Offer } from '../../offers/entities/offer.entity';
 
 @Entity()
 export class Wish {
@@ -40,8 +42,15 @@ export class Wish {
   @Length(1, 1024)
   description: string;
 
-  @ManyToOne(() => User, (user) => user.id, { eager: true })
-  offers: User;
+  @ManyToOne(() => User, (user) => user.wishes, {
+    onDelete: 'CASCADE',
+  })
+  owner: User;
+
+  @OneToMany(() => Offer, (offer) => offer.id, {
+    cascade: true,
+  })
+  offers: Offer[];
 
   @Column({ default: 0 })
   copied: number;

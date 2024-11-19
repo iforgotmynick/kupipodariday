@@ -4,6 +4,7 @@ import { Wish } from './entities/wish.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateWishDto } from './dto/update-wish.dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class WishesService {
@@ -14,8 +15,8 @@ export class WishesService {
     private readonly wishRepository: Repository<Wish>,
   ) {}
 
-  async createWish(wish: CreateWishDto): Promise<Wish> {
-    const newWish = this.wishRepository.create(wish);
+  async createWish(owner: User, wish: CreateWishDto): Promise<Wish> {
+    const newWish = this.wishRepository.create({ ...wish, owner });
 
     return this.wishRepository.save(newWish);
   }
@@ -43,7 +44,10 @@ export class WishesService {
   }
 
   async findOne(id: number): Promise<Wish> {
-    const wish = await this.wishRepository.findOneBy({ id });
+    const wish = await this.wishRepository.findOne({
+      where: { id },
+      relations: ['owner'],
+    });
 
     if (!wish) {
       throw new NotFoundException(`Wish with ID ${id} not found`);
@@ -73,7 +77,15 @@ export class WishesService {
     return this.wishRepository.remove(wish);
   }
 
-  async copy(id: number): Promise<Wish> {
-    throw new NotFoundException(`COPY ID ${id} PLEASE`);
+  async copy(owner: User, id: number): Promise<Wish> {
+    const wish = await this.wishRepository.findOne({ where: { id } });
+
+    if (!wish) {
+      throw new NotFoundException(`Wish with ID ${id} not found`);
+    }
+
+    const newWish = this.wishRepository.create({ ...wish, owner });
+
+    return this.wishRepository.save(newWish);
   }
 }

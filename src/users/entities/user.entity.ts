@@ -41,12 +41,12 @@ export class User {
   @Exclude()
   password: string;
 
-  @OneToMany(() => Wish, (wish) => wish.id)
+  @OneToMany(() => Wish, (wish) => wish.owner, { cascade: true })
   wishes: Wish[];
 
-  @OneToMany(() => Offer, (offer) => offer.id)
+  @OneToMany(() => Offer, (offer) => offer.item, { cascade: true })
   offers: Offer[];
 
-  @OneToMany(() => Wishlist, (wishlist) => wishlist.id)
+  @OneToMany(() => Wishlist, (wishlist) => wishlist.id, { cascade: true })
   wishlists: Wishlist[];
 }

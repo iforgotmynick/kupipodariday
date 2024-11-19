@@ -33,8 +33,13 @@ export class UsersController {
 
   @Get('me/wishes')
   getOwnWishes(@Request() req): Promise<Wish[]> {
+    this.logger.log('req.user', JSON.stringify(req.user));
     return this.usersService
       .findOneByUsername(req.user.name)
+      .then((user) => {
+        this.logger.log('user', JSON.stringify(user));
+        return user;
+      })
       .then((user) => user.wishes);
   }
 

@@ -22,7 +22,7 @@ export class WishesController {
 
   @Post()
   create(@Request() req, @Body() wish: CreateWishDto): Promise<Wish> {
-    return this.wishesService.createWish(wish);
+    return this.wishesService.createWish(req.user, wish);
   }
 
   @Get('last')
@@ -36,8 +36,8 @@ export class WishesController {
   }
 
   @Get(':id')
-  findOne(@Param() id: number): Promise<Wish> {
-    return this.wishesService.findOne(id);
+  findOne(@Param() { id }: { id: string }): Promise<Wish> {
+    return this.wishesService.findOne(+id);
   }
 
   @Patch(':id')
@@ -50,8 +50,8 @@ export class WishesController {
     return this.wishesService.remove(id);
   }
 
-  @Get(':id/copy')
-  wishCopy(@Param() id: number): Promise<Wish> {
-    return this.wishesService.copy(id);
+  @Post(':id/copy')
+  wishCopy(@Request() req, @Param() { id }: { id: string }): Promise<Wish> {
+    return this.wishesService.copy(req.user, +id);
   }
 }
