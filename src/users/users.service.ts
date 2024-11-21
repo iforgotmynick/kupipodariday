@@ -1,9 +1,14 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Like, Not, Repository } from 'typeorm';
 import { HashingService } from 'src/services/hashing/hashing.service';
 
 @Injectable()
@@ -16,10 +21,22 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const { password, ...otherUserData } = createUserDto;
+    const { password, email, username, ...otherUserData } = createUserDto;
+    const existingUser = await this.userRepository.findOne({
+      where: [{ email }, { username }],
+    });
+
+    if (existingUser) {
+      throw new ConflictException(
+        `A user with the name "${username}" or email "${email}" already exists`,
+      );
+    }
+
     const hashedPassword = await this.hashingService.hashPassword(password);
     const newUser = this.userRepository.create({
       ...otherUserData,
+      email,
+      username,
       password: hashedPassword,
     });
 
@@ -64,6 +81,23 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
+
+    const { email, username } = updateUserDto;
+
+    if (email || username) {
+      const existingUser = await this.userRepository.findOne({
+        where: [
+          { email, id: Not(id) },
+          { username, id: Not(id) },
+        ],
+      });
+
+      if (existingUser) {
+        throw new ConflictException(
+          `A user with the name "${username}" or email "${email}" already exists`,
+        );
+      }
+    }
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);

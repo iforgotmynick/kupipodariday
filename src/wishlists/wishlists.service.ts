@@ -70,6 +70,8 @@ export class WishlistsService {
       items,
     });
 
+    // in wishlists.controller.ts:47 I use @UseGuards(IsOwnerGuard), so not-owner cannot
+    // get to this point
     return this.wishlistRepository.save(updatedWishlist);
   }
 
@@ -80,6 +82,8 @@ export class WishlistsService {
       throw new NotFoundException(`Wishlist with ID ${id} not found`);
     }
 
+    // in wishlists.controller.ts:54 I use @UseGuards(IsOwnerGuard), so not-owner cannot
+    // get to this point
     return this.wishlistRepository.remove(wishlist);
   }
 }

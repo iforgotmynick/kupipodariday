@@ -3,28 +3,22 @@ import {
   ExecutionContext,
   Injectable,
   ForbiddenException,
-  NotFoundException,
   Inject,
 } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import { WishesService } from 'src/wishes/wishes.service';
 
 @Injectable()
 export class IsNotOwnerGuard implements CanActivate {
   constructor(
-    @Inject(UsersService) private readonly usersService: UsersService,
+    @Inject(WishesService) private readonly wishesService: WishesService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const userIdFromToken = request.user.id;
+    const wish = await this.wishesService.findOne(request.body.itemId);
 
-    const user = await this.usersService.findOne(userIdFromToken);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (userIdFromToken === user.id) {
+    if (userIdFromToken === wish.owner) {
       throw new ForbiddenException('You are not allowed to update this');
     }
 

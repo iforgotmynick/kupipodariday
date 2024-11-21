@@ -49,6 +49,7 @@ export class WishlistsController {
   }
 
   @Delete(':id')
+  @UseGuards(IsOwnerGuard)
   removeOne(@Param('id') id: string): Promise<Wishlist> {
     return this.wishlistsService.remove(+id);
   }
