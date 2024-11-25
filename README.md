@@ -58,9 +58,9 @@ Kupipodariday is a wishlist service designed to help users create and share thei
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 ## Acknowledgements
-- **Backend**: [Nest.js](https://nestjs.com/) 
-- **Database**: [PostgreSQL](https://www.postgresql.org/) 
-- **ORM**: [TypeORM](https://typeorm.io/)
+- **[Nest.js](https://nestjs.com/)**: For the backend framework.
+- **[PostgreSQL](https://www.postgresql.org/)**: For the database solution.
+- **[TypeORM](https://typeorm.io/)**: For the ORM.
 - **Idea**: [Yandex Practicum Backend](https://practicum.yandex.ru/profile/backend-nodejs)
 
 
