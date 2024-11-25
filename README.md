@@ -61,7 +61,7 @@ This project is licensed under the MIT License. See the LICENSE file for details
 - **[Nest.js](https://nestjs.com/)**: For the backend framework.
 - **[PostgreSQL](https://www.postgresql.org/)**: For the database solution.
 - **[TypeORM](https://typeorm.io/)**: For the ORM.
-- **Idea**: [Yandex Practicum Backend](https://practicum.yandex.ru/profile/backend-nodejs)
+- **[Yandex Practicum NodeJS](https://practicum.yandex.ru/profile/backend-nodejs)**: For the idea/inspiration
 
 
 `Felt like to make it public, might delete later`
