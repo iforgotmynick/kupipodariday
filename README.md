@@ -63,5 +63,6 @@ This project is licensed under the MIT License. See the LICENSE file for details
 - **[TypeORM](https://typeorm.io/)**: For the ORM.
 - **[Yandex Practicum NodeJS](https://practicum.yandex.ru/profile/backend-nodejs)**: For the idea/inspiration
 
+## Disclaimer
 
-`Felt like to make it public, might delete later`
+Felt like making this public for now — might delete later. This project is a work in progress (WIP) and not intended for production use at the moment.
